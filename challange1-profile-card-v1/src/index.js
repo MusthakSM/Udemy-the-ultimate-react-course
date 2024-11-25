@@ -72,17 +72,7 @@ function SkillList() {
   return (
     <div className="skill-list">
       {skills.map((skill) => (
-        <Skill
-          skill={skill.skill}
-          emoji={
-            skill.level === "advanced"
-              ? "💪"
-              : skill.level === "intermediate"
-              ? "👍"
-              : "👶"
-          }
-          color={skill.color}
-        />
+        <Skill skill={skill.skill} level={skill.level} color={skill.color} />
       ))}
 
       {/* <Skill skill="React" emoji="💪" color="lightblue" />
@@ -93,11 +83,15 @@ function SkillList() {
   );
 }
 
-function Skill(props) {
+function Skill({ skill, color, level }) {
   return (
-    <div className="skill" style={{ backgroundColor: props.color }}>
-      <span>{props.skill}</span>
-      <span>{props.emoji}</span>
+    <div className="skill" style={{ backgroundColor: color }}>
+      <span>{skill}</span>
+      <span>
+        {level === "beginner" && "👶"}
+        {level === "intermediate" && "👍"}
+        {level === "advanced" && "💪"}
+      </span>
     </div>
   );
 }
