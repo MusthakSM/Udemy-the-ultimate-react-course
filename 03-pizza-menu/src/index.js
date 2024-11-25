@@ -104,6 +104,9 @@ function Menu() {
 }
 
 function Pizza(props) {
+  // This if avoids the rendering of pizza if its soldOut property is true.,..
+  if (props.pizzaObj.soldOut) return null;
+
   return (
     <li className="pizza">
       <img src={props.pizzaObj.photoName} alt={props.pizzaObj.name} />
