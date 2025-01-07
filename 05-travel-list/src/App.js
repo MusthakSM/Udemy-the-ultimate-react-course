@@ -8,11 +8,35 @@ const initialItems = [
 export default function App() {
   const [items, setItems] = useState(initialItems);
 
+  function handleAddItems(item) {
+    setItems((items) => [...items, item]);
+  }
+
+  function handleDeleteItem(id) {
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
+
+  function handleItemPacking(id) {
+    setItems((items) =>
+      items.map((item) => {
+        if (item.id === id) {
+          item.packed = !item.packed;
+          return { ...item, packed: !item.packed };
+        }
+        return item;
+      })
+    );
+  }
+
   return (
     <div className="app">
       <Logo />
-      <Form items={items} setItems={setItems} />
-      <PackingList items={items} setItems={setItems} />
+      <Form onAddItems={handleAddItems} itemsCount={items.length} />
+      <PackingList
+        items={items}
+        onDeleteItem={handleDeleteItem}
+        onHanldePicked={handleItemPacking}
+      />
       <Stats items={items} />
     </div>
   );
@@ -22,7 +46,7 @@ function Logo() {
   return <h1>🌴 Far Away 💼</h1>;
 }
 
-function Form({ items, setItems }) {
+function Form({ onAddItems, itemsCount }) {
   const [description, setDescription] = useState("");
   const [quantity, SetQuantity] = useState(1);
 
@@ -32,11 +56,13 @@ function Form({ items, setItems }) {
     // Input gaurd for item's
     if (!description) window.alert("Please provide an item name ");
 
-    const newId = items[items.length - 1].id + 1;
+    const newId = itemsCount + 1;
 
     const newItem = { id: newId, description, quantity, packed: false };
 
-    setItems([...items, newItem]);
+    console.log(newItem);
+
+    onAddItems(newItem);
 
     setDescription("");
     SetQuantity(1);
@@ -68,44 +94,35 @@ function Form({ items, setItems }) {
   );
 }
 
-function PackingList({ items, setItems }) {
+function PackingList({ items, onDeleteItem, onHanldePicked }) {
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item item={item} items={items} setItems={setItems} key={item.id} />
+          <Item
+            item={item}
+            onDeleteItem={onDeleteItem}
+            onHanldePicked={onHanldePicked}
+            key={item.id}
+          />
         ))}
       </ul>
     </div>
   );
 }
 
-function Item({ item, items, setItems }) {
-  function removeItem() {
-    const updatedItems = items.filter((i) => i.id !== item.id);
-    setItems([...updatedItems]);
-  }
-
-  function handlePacked(e) {
-    const checkedStatus = e.target.checked;
-    const updatedItems = items.map((i) => {
-      if (i.id === item.id) {
-        return { ...i, packed: checkedStatus };
-      }
-
-      return i;
-    });
-
-    setItems([...updatedItems]);
-  }
-
+function Item({ item, onDeleteItem, onHanldePicked }) {
   return (
     <li>
-      <input type="checkbox" checked={item.packed} onChange={handlePacked} />
+      <input
+        type="checkbox"
+        checked={item.packed}
+        onChange={() => onHanldePicked(item.id)}
+      />
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
-      <button onClick={removeItem}>❌</button>
+      <button onClick={() => onDeleteItem(item.id)}>❌</button>
     </li>
   );
 }
