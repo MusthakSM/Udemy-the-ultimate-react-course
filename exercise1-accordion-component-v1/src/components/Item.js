@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 export default function Item({ title, number, curOpen, onOpen, children }) {
   const isOpen = number === curOpen;
 
