@@ -1,4 +1,4 @@
-import { Children, useEffect, useState } from "react";
+import { Children, useState } from "react";
 import "./index.css";
 
 const tempMovieData = [
@@ -51,53 +51,21 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-const KEY = "edc4b83";
-
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const query = "afad";
-
-  useEffect(() => {
-    async function fetchMovies() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-        );
-
-        if (!res.ok)
-          throw new Error("Something went wrong with fetching movies");
-
-        const data = await res.json();
-        if (data.Response === "False") throw new Error("Movie not found");
-
-        setMovies(data.Search);
-        console.log(data.Search);
-      } catch (err) {
-        console.log(err.message);
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchMovies();
-  }, []);
+  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
 
   return (
     <>
+      {/* Good examples of component composition.. */}
+      {/* it helps to avoid prop drilling which is very tedius in a longly nested component treee */}
+      {/* it can be used to create layouts */}
       <NavBar>
         <NumResults movies={movies} />
       </NavBar>
       <Main>
         <Box>
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
-          {!isLoading && !error && <MovieList movies={movies} />}
-          {error && <ErrorMessage message={error} />}
-          {isLoading && <Loader />}
+          <MovieList movies={movies} />
         </Box>
 
         <Box>
@@ -106,19 +74,6 @@ export default function App() {
         </Box>
       </Main>
     </>
-  );
-}
-
-function Loader() {
-  return <p className="loader">Loading...</p>;
-}
-
-function ErrorMessage({ message }) {
-  return (
-    <p className="error">
-      <span>⛔</span>
-      {message}
-    </p>
   );
 }
 
