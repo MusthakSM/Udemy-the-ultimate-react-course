@@ -56,7 +56,7 @@ const average = (arr) =>
 const KEY = "edc4b83";
 
 export default function App() {
-  const [query, setQuery] = useState("Thor");
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -113,6 +113,7 @@ export default function App() {
       return;
     }
 
+    handleCloseMovie(); // close the selected movie, when a search take place.
     fetchMovies();
 
     return function () {
@@ -306,6 +307,25 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onCloseMovie();
   }
 
+  // Effect to close the Movie details on ESC keypress.
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
+
+  // Effect to get the Movie details
   useEffect(
     function () {
       async function getMovieDetails() {
@@ -324,6 +344,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [selectedId]
   );
 
+  // Effect to change the page title to the name of the selected movie.
   useEffect(
     function () {
       if (!title) return;
