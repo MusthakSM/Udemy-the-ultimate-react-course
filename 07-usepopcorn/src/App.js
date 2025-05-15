@@ -3,6 +3,7 @@ import "./index.css";
 import "./StarRating";
 import StarRating from "./StarRating";
 import { useMovies } from "./useMovies";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -11,16 +12,10 @@ const KEY = "edc4b83";
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState(null);
-  // const [watched, setWatched] = useState([]);
-  const [watched, setWatched] = useState(function () {
-    // at the initial render get the watched movie list from the local storage. can use a callback function.
-    // This callback function should be pure function.
-    const watchedMovies = localStorage.getItem("watched");
-    return JSON.parse(watchedMovies);
-  });
-
   const { movies, isLoading, error } = useMovies(query); // custom hook
+  const [selectedId, setSelectedId] = useState(null);
+
+  const [watched, setWatched] = useLocalStorageState([], "watched");
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (selectedId === id ? null : id));
@@ -40,14 +35,6 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
-
-  useEffect(
-    function () {
-      // saving the watched movies into borwser's local storage..
-      localStorage.setItem("watched", JSON.stringify(watched));
-    },
-    [watched]
-  );
 
   return (
     <>
